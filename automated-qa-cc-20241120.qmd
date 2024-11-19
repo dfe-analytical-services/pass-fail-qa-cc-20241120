@@ -319,8 +319,8 @@ cameron.race\@education.gov.uk
 
 Slides made with Quarto
 
--   GitHub repository
+-   [GitHub repository](https://github.com/dfe-analytical-services/pass-fail-qa-cc-20241120)
 
 -   Slides themselves (deployed to GitHub pages)
 
--   Get started on your own Quarto slides
+-   [Get started on your own Quarto slides](https://quarto.org/docs/presentations/)
