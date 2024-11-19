@@ -1,0 +1,326 @@
+---
+title: "Automated pass / fail QA in R"
+author: "Cam Race"
+format:
+  revealjs:
+    logo: logo.png
+    smaller: true
+    incremental: true
+    footer: Automated pass / fail QA in R, November 2024
+theme: white
+class: smaller
+fig-cap-location: top
+layout-valign: center
+css: "theme.css"
+---
+
+## What I will cover
+
+-   A quick overview of what is possible when testing
+
+    -   R code (e.g. in analysis or pipelines)
+
+    -   R Shiny applications
+
+    -   R packages
+
+-   Show a number of examples of testing with R code that
+
+    -   R users can steal, adapt, and reuse
+
+    -   Non R users or senior managers can use as inspiration when directing their teams QA
+
+## Disclaimer: I am not going to
+
+-   Show you through a specific project
+
+    -   Instead, I'll compensate by scatter-gunning some examples in the hope they provide useful inspiration
+
+-   Teach you to become an analyst
+
+    -   There are many aspects of QA that require analytical skills, experience and insight to assess and make judgement calls, you can't do all QA with just pass / fail tests.
+
+-   Teach you how to build R Shiny apps or R packages
+
+    -   Both could have multiple coffee and coding sessions in their own right
+
+    -   Our very own Chris Dias has made some great updates to the Analysts' Guide highlight R Shiny guidance \[LINK\]
+
+    -   For R packages look no further than [R packages by Hadley Wickham and Jennifer Bryan](https://r-pkgs.org/), it is the Rosetta Stone of R package development
+
+## If you don't yet use use R
+
+-   See our unit's R workshops
+
+-   OR some of the many, great free online resources
+
+-   With copilot web now standard for everyone in DfE there's no excuses for not giving it a go yourself. The best software developers don't have lots of unique knowledge, they're just usually the most willing to search for the answers to problems themselves instead of relying on others
+
+## Why use automated pass / fail checks as a part of QA?
+
+-   They are incredibly...
+
+    -   fast
+
+    -   reliable
+
+    -   easy to understand
+
+-   They are the best way to start including simple automated checks into your code and data with minimal extra time or overhead to your processes
+
+-   Today I will show you a number of examples of how you can use them, in the hope it inspires you to start adding your own pass / fail checks!
+
+## Working alone?
+
+!['You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'](img/frederick_taxi_driver.png){alt="'You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'" fig-alt="'You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'"}
+
+::: footer
+Frederick De Niro, 2024
+:::
+
+## Packages we'll use
+
+-   [testthat](https://testthat.r-lib.org/)
+
+-   [shinytest2](https://rstudio.github.io/shinytest2/) (Side note: Are you still using the original shinytest? Stop. Migrate to shinytest2 now.)
+
+-   [usethis](https://usethis.r-lib.org/)
+
+-   [devtools](https://devtools.r-lib.org/)
+
+-   Bonus levels:
+
+    -   [lintr](https://lintr.r-lib.org/)
+
+    -   [styler](https://styler.r-lib.org/)
+
+    -   [GitHub Actions](https://github.com/features/actions) (not a package, nor specifically for R, but something that is genuinely excellent and you should make use of if you can)
+
+# Let us begin
+
+![](img/frederick_r_magic_carpet.png){fig-alt="A mediocre visual pun smushing R with Disney's Aladdin" fig-align="center"}
+
+# Testing R code with testthat
+
+## Testing principles
+
+::: fragment
+You should always think of automated tests as three phases
+
+-   GIVEN
+
+    -   Set up a context
+
+-   WHEN
+
+    -   Do a thing
+
+-   THEN
+
+    -   Expect a certain result
+:::
+
+## Testing principles
+
+-   GIVEN
+
+    -   Two numbers
+
+-   WHEN
+
+    -   You run a function on those numbers to add them together
+
+-   THEN
+
+    -   You get the sum of those two numbers
+
+## Testing principles - testthat example
+
+``` r
+library(testthat)
+
+# GIVEN
+x <- 2
+y <- 3
+
+# WHEN
+z <- sum(x, y)
+
+# THEN
+expect_equal(z, 5) # function from testthat
+```
+
+## Testing principles - tidied example
+
+``` r
+library(testthat)
+
+# GIVEN
+x <- 2
+y <- 3
+
+# WHEN & THEN
+expect_equal(sum(x, y), 5)
+
+# This passes, so nothing happens, it doesn't print to the console and the rest of your code will run as normal
+```
+
+## What if it fails?
+
+```{r eval=FALSE, echo=TRUE}
+library(testthat)
+
+# GIVEN
+x <- 2
+y <- 2 # uh-oh spaghetti-o
+
+# WHEN & THEN
+expect_equal(sum(x, y), 5)
+```
+
+```{r}
+library(testthat)
+
+# GIVEN
+x <- 2
+y <- 2 # uh-oh spaghetti-o
+
+# WHEN & THEN
+try(expect_equal(sum(x, y), 5))
+```
+
+This throws an error and stops your code - this is particularly helpful if you have certain expectations that later code relies on, and allows you to fix the problem before it compounds and causes lots of later errors.
+
+## Some more examples
+
+As it says
+
+## The good
+
+## The bad
+
+## The ugly
+
+## expect\_\* functions
+
+Some links / text for a range of the expect functions
+
+# Testing R Shiny applications
+
+## Different forms of tests
+
+Show the pyramid
+
+## Different R Shiny tests
+
+testthat is great for unit tests
+
+Shiny has testServer built in already
+
+shinytest2 gives you the full end to end tests (also known as UI tests)
+
+-   UI = User Interface
+
+# Bonus: Continuous integration
+
+Who doesn't love bonus content?
+
+Here as a bonus as it actually applies to multiple types of projects, not just R Shiny applications.
+
+If your code is open and hosted in GitHub (i.e. is safe to share publicly), then you get GitHub Actions for free, and it's incredibly powerful.
+
+What is CI
+
+Examples of how we have it set up
+
+Screenshots of the good, the bad and the ugly
+
+# Bonus: linting
+
+Applicable to all projects, though included here as a bonus as it's particularly important for R packages
+
+Mention lintr and styler, show some before / after examples and also example errors / checks.
+
+Screenshots of the good, the bad and the ugly
+
+# Testing R packages
+
+## What is an R package
+
+Some examples of how you already use them (library call and then do some stuff to a data frame)
+
+## What does a package look like?
+
+Demo using dfeR and the comma_sep function against just writing a function.
+
+Think of it as being able to reuse others functions and having documentation on how they work
+
+A great reason why structuring code as an R package can be helpful even just for pipelines within teams - see Jacob's C+C (or Matt Jago?) from a few years ago for more details.
+
+## Unit tests
+
+Show some examples on the same functions
+
+## R CMD Check
+
+The big cheese of the checks for R packages.
+
+So much so it has it's own function and keyboard shortcut in R Studio - Ctrl-Shift-E.
+
+If you do one test on an R package it should be this
+
+Some background on what it covers, any package hoping to get to CRAN should be running this as a minimum.
+
+Example issues it can pick up.
+
+Setting it up for an R package hosted in GitHub is easy.
+
+## What checks have we used on dfeshiny?
+
+Custom unit tests
+
+GitHub actions:
+
+-   R CMD check
+
+    -   Our tests
+
+    -   linting
+
+    -   Spelling
+
+    -   General package checks
+
+-   Example dashboard running shinytest2 checks
+
+-   
+
+# Wrap up
+
+## Remember
+
+Pass / fail tests will never replace all QA, you still need to use analytical judgement in QA.
+
+GIVEN - WHEN - THEN
+
+Don't feel like you need to re-test other packages functions, that's overkill, but do do some research on the quality of the packages you're using!
+
+Pass / fail tests are fantastic for giving you quick and effective feedback on your code, helping to speed up development and catch bugs early.
+
+## Support?
+
+If in doubt - ask the community!
+
+statistics.development\@education.gov.uk are also here to support with all things R and automation!
+
+## Any questions?
+
+cameron.race\@education.gov.uk
+
+Slides made with Quarto
+
+-   GitHub repository
+
+-   Slides themselves (deployed to GitHub pages)
+
+-   Get started on your own Quarto slides
