@@ -1,5 +1,5 @@
 ---
-title: "Automated pass / fail QA in R"
+title: "Test that! No literally, testthat..."
 author: "Cam Race"
 format:
   revealjs:
@@ -14,9 +14,9 @@ layout-valign: center
 css: "theme.css"
 ---
 
-## What I will cover
+## What I hope to cover
 
--   A quick overview of what is possible when testing
+-   A quick overview of what is possible when using testthat for quick pass / fail checks in
 
     -   R code (e.g. in analysis or pipelines)
 
@@ -28,19 +28,21 @@ css: "theme.css"
 
     -   R users can steal, adapt, and reuse
 
-    -   Non R users or senior managers can use as inspiration when directing their teams QA
+    -   Non R users or senior managers can use as inspiration when directing their teams quality assurance (QA)
 
 ## Disclaimer: I am not going to
 
--   Show you through a specific project
+-   Show you through one specific project
 
     -   Instead, I'll compensate by scatter-gunning some examples in the hope they provide useful inspiration
 
--   Teach you to become an analyst
+-   Teach you to QA
 
-    -   There are many aspects of QA that require analytical skills, experience and insight to assess and make judgement calls, you can't do all QA with just pass / fail tests.
+    -   There are many aspects of QA that require analytical skills, experience and insight to assess and make judgement calls, you can't do all QA with just pass / fail tests
 
 -   Teach you how to build R Shiny apps or R packages
+
+    -   I will skim over some of the details of these
 
     -   Both could have multiple coffee and coding sessions in their own right
 
@@ -48,13 +50,31 @@ css: "theme.css"
 
     -   For R packages look no further than [R packages by Hadley Wickham and Jennifer Bryan](https://r-pkgs.org/), it is the Rosetta Stone of R package development
 
-## If you don't yet use use R
+    -   Take a look at some relevant past coffee and coding sessions! \[LINK\]
+
+## If you want to get more confident using R
 
 -   See our unit's R workshops
 
 -   OR some of the many, great free online resources
 
--   With copilot web now standard for everyone in DfE there's no excuses for not giving it a go yourself. The best software developers don't have lots of unique knowledge, they're just usually the most willing to search for the answers to problems themselves instead of relying on others
+-   Remember, the best coders don't have lots of unique knowledge, they're just usually the most willing to search for the answers to problems themselves instead of relying on others, so get stuck in yourself and get curious!
+
+## Basic example of what we're going to look at
+
+Many of you who've written R code before will have come across something like this:
+
+```{r echo=TRUE}
+my_table <- as.data.frame("")
+
+if(nrow(my_table) == 0){
+  stop("There are no rows in the table, this can't be right!")
+}
+```
+
+-   This is an example of pass / fail automated QA!
+
+-   It checks for a condition and then if it meets a criteria it stops the code and tries to give a semi-informative error
 
 ## Why use automated pass / fail checks as a part of QA?
 
@@ -68,25 +88,65 @@ css: "theme.css"
 
 -   They are the best way to start including simple automated checks into your code and data with minimal extra time or overhead to your processes
 
--   Today I will show you a number of examples of how you can use them, in the hope it inspires you to start adding your own pass / fail checks!
+## Working as a part of a team?
+
+-   Adding in quick automated pass fail checks will
+
+    -   Make it easier for everyone to run the same code reliably
+
+    -   Make it easier for everyone to understand what the code is supposed to be doing
+
+    -   Cut down the time when investigating issues
+
+    -   Gives assurance when reviewing each others code that you're making the same assumptions
+
+    -   All because it clearly and simply documents and tests your assumptions
+
+-   You can also use them to add in catches for steps that require manual intervention e.g.
+
+    ```{r echo=TRUE}
+    countries <- as.data.frame("")
+
+    if(nrow(countries) == 0){
+      stop("You've forgotten to add countries, run the countries_import.R script before continuing")
+    }
+    ```
 
 ## Working alone?
 
-!['You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'](img/frederick_taxi_driver.png){alt="'You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'" fig-alt="'You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'"}
+-   <div>
 
-::: footer
-Frederick De Niro, 2024
-:::
+    !['You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'](img/frederick_taxi_driver.png){fig-alt="'You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'" width="400"}
+
+    </div>
+
+<!-- -->
+
+-   Adding in quick automated pass fail checks will
+
+    -   Make it easier for you to run the same code reliably
+
+    -   Make it easier for you to understand what the code is supposed to be doing
+
+    -   Cut down the time when investigating issues
+
+    -   Gives assurance when writing code that it and the outputs are being QA'd consistently
 
 ## Packages we'll use
 
--   [testthat](https://testthat.r-lib.org/)
+-   For everyone
 
--   [shinytest2](https://rstudio.github.io/shinytest2/) (Side note: Are you still using the original shinytest? Stop. Migrate to shinytest2 now.)
+    -   [testthat](https://testthat.r-lib.org/)
 
--   [usethis](https://usethis.r-lib.org/)
+-   For R Shiny developers
 
--   [devtools](https://devtools.r-lib.org/)
+    -   [shinytest2](https://rstudio.github.io/shinytest2/) (Side note: Are you still using the original shinytest? Stop. Migrate to shinytest2 now.)
+
+-   For R package developers
+
+    -   [usethis](https://usethis.r-lib.org/)
+
+    -   [devtools](https://devtools.r-lib.org/)
 
 -   Bonus levels:
 
@@ -96,7 +156,7 @@ Frederick De Niro, 2024
 
     -   [GitHub Actions](https://github.com/features/actions) (not a package, nor specifically for R, but something that is genuinely excellent and you should make use of if you can)
 
-# Let us begin
+# A whole new world...
 
 ![](img/frederick_r_magic_carpet.png){fig-alt="A mediocre visual pun smushing R with Disney's Aladdin" fig-align="center"}
 
@@ -107,17 +167,9 @@ Frederick De Niro, 2024
 ::: fragment
 You should always think of automated tests as three phases
 
--   GIVEN
-
-    -   Set up a context
-
--   WHEN
-
-    -   Do a thing
-
--   THEN
-
-    -   Expect a certain result
+1.  GIVEN
+2.  WHEN
+3.  THEN
 :::
 
 ## Testing principles
@@ -147,7 +199,10 @@ y <- 3
 z <- sum(x, y)
 
 # THEN
-expect_equal(z, 5) # function from testthat
+# Instead of an if statement we use the expect_* functions from testthat
+expect_equal(z, 5) 
+
+# If this passes nothing happens, it doesn't print to the console, and the rest of your code will run as normal
 ```
 
 ## Testing principles - tidied example
@@ -159,10 +214,8 @@ library(testthat)
 x <- 2
 y <- 3
 
-# WHEN & THEN
+# WHEN & THEN (often written this way for conciseness)
 expect_equal(sum(x, y), 5)
-
-# This passes, so nothing happens, it doesn't print to the console and the rest of your code will run as normal
 ```
 
 ## What if it fails?
@@ -191,136 +244,433 @@ try(expect_equal(sum(x, y), 5))
 
 This throws an error and stops your code - this is particularly helpful if you have certain expectations that later code relies on, and allows you to fix the problem before it compounds and causes lots of later errors.
 
-## Some more examples
+## Examples
 
-As it says
+Catching if I need to take a manual action
 
-## The good
+TODO: dig out analytics example
 
-## The bad
+## Example data you can use yourself
 
-## The ugly
+```{r echo=TRUE}
+head(dplyr::starwars)
 
-## expect\_\* functions
+# Could also do it this way
+#
+# library(dplyr)
+# head(starwars)
+```
 
-Some links / text for a range of the expect functions
+## Examples on star wars data
+
+```{r eval=FALSE, echo=TRUE}
+
+# Check that df_starwars is a data frame
+testthat::expect_true(dplyr::starwars |> is.data.frame())
+
+# An alternative that I know will fail
+testthat::expect_true(dplyr::starwars |> is.vector())
+```
+
+```{r}
+try(testthat::expect_true(dplyr::starwars |> is.vector()))
+```
+
+-   These kind of class / type checks are particularly useful for
+
+    -   Catching issues early in processes to prevent compound errors
+
+    -   Quality checking output data
+
+## Examples on star wars data
+
+```{r echo=TRUE, eval=FALSE}
+# Check that the height column is numeric
+testthat::expect_true(dplyr::starwars$height |> is.numeric())
+
+# An alternative that I know will fail
+testthat::expect_true(dplyr::starwars$height |> is.character())
+```
+
+```{r}
+try(testthat::expect_true(dplyr::starwars$height |> is.character()))
+```
+
+## Examples on star wars data
+
+```{r echo=TRUE, eval=FALSE}
+# Check that no characters have a height over 500cm
+testthat::expect_lt(dplyr::starwars$height |> max(na.rm=TRUE), 500)
+
+# An example I know will fail
+testthat::expect_gt(dplyr::starwars$height |> max(na.rm=TRUE), 500)
+```
+
+```{r}
+try(testthat::expect_gt(dplyr::starwars$height |> max(na.rm=TRUE), 500))
+```
+
+-   Again, this kind of check can be easily applied to sense-check your data ranges, before, during and after processing
+
+## Examples on star wars data
+
+```{r echo=TRUE, eval=FALSE}
+# Check that there are at least unique 50 characters
+testthat::expect_gte(
+  dplyr::starwars |> 
+    dplyr::distinct(name) |> 
+    nrow(), 
+  50
+)
+
+# An example I know will fail
+testthat::expect_lte(
+  dplyr::starwars |> 
+    dplyr::distinct(name) |> 
+    nrow(), 
+  50
+)
+```
+
+```{r}
+try(
+  testthat::expect_lte(
+  dplyr::starwars |> 
+    dplyr::distinct(name) |> 
+    nrow(), 
+  50
+)
+)
+```
+
+-   This could be particularly useful if you want to have a quick check to make sure you have the right number of LA's and haven't accidentally lost any in a join or aggregation
+
+## Examples on star wars data
+
+```{r echo=TRUE, eval=FALSE}
+# Check that a common problematic rogue entry isn't there
+testthat::expect_in(
+  "Professor Charles Xavier",
+  dplyr::starwars$name
+)
+
+```
+
+```{r}
+try(testthat::expect_in(
+  "Professor Charles Xavier",
+  !dplyr::starwars$name
+))
+```
+
+```{r echo=TRUE, eval=FALSE}
+# Check that if all items in a vector are present
+testthat::expect_contains(
+  dplyr::starwars$name, 
+  !c("Professor Charles Xavier", "C-3PO", "R2-D2")
+)
+```
+
+```{r}
+try(testthat::expect_contains(
+  dplyr::starwars$name, 
+  !c("Professor Charles Xavier", "C-3PO", "R2-D2")
+))
+```
+
+## Example on locations data
+
+```{r echo=TRUE, eval=TRUE}
+head(dfeR::wd_pcon_lad_la_rgn_ctry)
+```
+
+## Example on locations data
+
+```{r echo=TRUE, eval=FALSE}
+lookup <- dfeR::wd_pcon_lad_la_rgn_ctry
+
+# Check that the lookup file contains all LAs in England in 2024
+expect_contains(
+  lookup$la_name,
+  dfeR::fetch_las(year = 2024, countries = "England") |> 
+    pull(la_name)
+)
+
+# Example of it failing
+expect_contains(
+  lookup$la_name,
+  "Westeros"
+)
+```
+
+```{r}
+lookup <- dfeR::wd_pcon_lad_la_rgn_ctry
+
+try(
+  expect_contains(
+  lookup$la_name,
+  "Westeros"
+)
+)
+```
+
+-   An example where this might be helpful is when doing analysis across boundary changes, and you've had a specific issue with a rogue location not appearing in your latest year of data when it should be there
+
+-   It's quick and easy to add specific checks to give you and others relying on your analysis peace of mind that those issues can't be repeated!
+
+## Most common expect\_\* functions
+
+-   expect_equal() / expect_identical()
+
+-   expect_true() / expect_false()
+
+-   expect_lt() / expect_lte() / expect_gt / expect_gte()
+
+-   expect_contains() / expect_in()
+
+-   expect_error() / expect_warning() / expect_message()
+
+-   expect_no_error() / expect_no_warning() / expect_no_message()
+
+-   You can even build [custom expectations](https://testthat.r-lib.org/articles/custom-expectation.html)
+
+-   Full list and documentation on the [testthat site](https://testthat.r-lib.org/reference/index.html)
+
+## When and where should I do this?
+
+Really you could be doing this before, during, and after your analysis code! For example, you might already do this kind of thing in SQL scripts
+
+``` sql
+SELECT * FROM my_table
+
+-- 1,551 rows
+
+SELECT DISTINCT (la_name) FROM my_table
+
+-- 153 rows
+```
+
+-   This is how you should think of these checks, a way of regularly documenting your assumptions through the code!
+
+## When and where should I do this?
+
+``` {.r .R}
+library(dplyr)
+library(testthat)
+
+# Import data
+raw_data <- starwars
+
+# Check raw data has at least 50 rows
+expect_gte(nrow(raw_data), 50)
+
+# Process data to aggregate by species
+species_summary <- raw_data |> 
+  group_by(species) |> 
+  summarise(
+    avg_height = mean(height, na.rm = TRUE),
+    avg_mass = mean(mass, na.rm = TRUE)
+  )
+
+# Check the processing
+expect_equal(ncol(species_summary), 3)
+expect_equal(
+  nrow(species_summary),
+  raw_data$species |> 
+    unique() |> 
+    length()
+)
+
+# Imagine the final output is the summary table
+# Sense check the output data
+expect_true(species_summary$avg_mass |> is.numeric())
+expect_true(all(!is.nan(species_summary$avg_mass)))
+expect_gte(species_summary$avg_mass |> min(), 20)
+```
+
+## When and where should I do this?
+
+For more examples of code using this have a look at:
+
+-   RAP knowledge share on QA - Fran Elliot in particular showed some good examples
+
+-   Coffee and coding on testing R code - ?
 
 # Testing R Shiny applications
 
-## Different forms of tests
-
-Show the pyramid
-
 ## Different R Shiny tests
 
-testthat is great for unit tests
+Testing an application is different to analysis or pipelines, you'll often have a 'suite' or 'suites' of tests that you run periodically in bulk to quickly check the latest version of the code still does all the things it used to.
 
-Shiny has testServer built in already
+Test types are:
 
-shinytest2 gives you the full end to end tests (also known as UI tests)
+1.  Unit tests
+    -   Low level
 
--   UI = User Interface
+    -   Check the behaviour of specific functions
 
-# Bonus: Continuous integration
+    -   testthat is ideal for this
 
-Who doesn't love bonus content?
+    -   Very quick to create and to run
+2.  Integration tests
+    -   Medium level, integrating a number of moving parts
 
-Here as a bonus as it actually applies to multiple types of projects, not just R Shiny applications.
+    -   Shiny has testServer() built in already
 
-If your code is open and hosted in GitHub (i.e. is safe to share publicly), then you get GitHub Actions for free, and it's incredibly powerful.
+    -   Pretty quick to run, bit more effort to set up
+3.  UI (User Interface) or 'End to end' tests
+    -   Full test of the user experience and all components
 
-What is CI
+    -   shinytest2 gives you the full end to end tests (also known as UI tests)
 
-Examples of how we have it set up
+    -   Take longer to run, and a lot more effort to set up
 
-Screenshots of the good, the bad and the ugly
+## Different forms of tests
 
-# Bonus: linting
+![](img/testing-pyramid.webp)
 
-Applicable to all projects, though included here as a bonus as it's particularly important for R packages
+## Running the tests
 
-Mention lintr and styler, show some before / after examples and also example errors / checks.
+-   In an R Shiny application you'll usually have a tests/ folder that contains all of your test scripts
 
-Screenshots of the good, the bad and the ugly
+-   Assuming you have shinytest2 installed, you can automatically run all of the above types of tests together using `shinytest2::test_app()`
+
+## Demo app
+
+GitHub repository \[TODO\]
+
+# Bonus: Continuous integration (CI)
+
+## Bonus: Continuous integration (CI)
+
+-   Who doesn't love bonus content? This is here as a bonus as it actually applies to multiple types of projects, not just R Shiny applications.
+
+-   Continuous integration is
+
+    -   the practice of integrating code changes frequently and ensuring that the integrated codebase is in a workable state
+
+    -   For our purposes, this means that every time we make a new version of the code, tests are run automatically against that code, speeding up the process!
+
+-   If your code is open and hosted in GitHub (i.e. is safe to share publicly), then you get GitHub Actions for free, and it's incredibly powerful
+
+<!-- -->
+
+-   Free access to virtual machines that will run and test your code for you
+
+    -   A free way to automate code scripts on Git events (commits / pushes / PRs) or on a scheduled job (e.g. once everyday at midnight)
+
+    -   Integrate your tests with version control processes, so you have a clear audit trail and can proactively prevent issues from getting to your live application
+
+-   This is particularly useful where you have specific test folders or scripts that you want to run periodically against a 'product' but not inline in the actual code, e.g. R Shiny applications, R packages, deployed R models etc
+
+## Example of CI
+
+For an example Shiny app that runs continuous integration, have a look at the [explore education statistics data screener on GitHub](https://github.com/dfe-analytical-services/dfe-published-data-qa).
 
 # Testing R packages
 
 ## What is an R package
 
-Some examples of how you already use them (library call and then do some stuff to a data frame)
+Every R user will have used some R packages at some point. For example:
 
-## What does a package look like?
+```{r echo=TRUE}
+library(dplyr)
+```
 
-Demo using dfeR and the comma_sep function against just writing a function.
+-   This loads all of the functions that are premade in dplyr, ready into your R session for you to use!
+
+-   It's similar conceptually to having a `functions.R` script in your project and then running `source("functions.R")` so you can make use of the functions!
+
+## What does a package actually look like?
 
 Think of it as being able to reuse others functions and having documentation on how they work
 
-A great reason why structuring code as an R package can be helpful even just for pipelines within teams - see Jacob's C+C (or Matt Jago?) from a few years ago for more details.
+```{r echo=TRUE}
+library(dfeR)
 
-## Unit tests
+comma_sep(3000)
 
-Show some examples on the same functions
+comma_sep
+```
 
-## R CMD Check
+## What does code in a package actually look like?
 
-The big cheese of the checks for R packages.
+```{r echo=TRUE}
+#' Comma separate
+#'
+#' @description
+#' Adds separating commas to big numbers. If a value is not numeric it will
+#' return the value unchanged and as a string.
+#'
+#' @param number number to be comma separated
+#' @param nsmall minimum number of digits to the right of the decimal point
+#'
+#' @return string
+#' @export
+#'
+#' @examples
+#' comma_sep(100)
+#' comma_sep(1000)
+#' comma_sep(3567000)
+comma_sep <- function(number,
+                      nsmall = 0L) {
+  format(number,
+    big.mark = ",", nsmall = nsmall, trim = TRUE,
+    scientific = FALSE
+  )
+}
+```
 
-So much so it has it's own function and keyboard shortcut in R Studio - Ctrl-Shift-E.
+The documentation ([roxygen2](https://roxygen2.r-lib.org/)) and easy automation built around R packages using [devtools](https://devtools.r-lib.org/) and [usethis](https://usethis.r-lib.org/) is a great reason why structuring code as an R package can be helpful even just for pipelines within teams - see Jacob's C+C (or Matt Jago?) \[TODO\] from a few years ago for more details.
 
-If you do one test on an R package it should be this
+## Package tests examples
 
-Some background on what it covers, any package hoping to get to CRAN should be running this as a minimum.
+Most commonly in an R package you have unit tests against your functions so that you can ensure they reliably behave as expected for users of the package.
 
-Example issues it can pick up.
+Example - [dfeR tests folder](https://github.com/dfe-analytical-services/dfeR/tree/main/tests)
 
-Setting it up for an R package hosted in GitHub is easy.
-
-## What checks have we used on dfeshiny?
-
-Custom unit tests
-
-GitHub actions:
-
--   R CMD check
-
-    -   Our tests
-
-    -   linting
-
-    -   Spelling
-
-    -   General package checks
-
--   Example dashboard running shinytest2 checks
-
--   
+Example - [dfeshiny tests folder](https://github.com/dfe-analytical-services/dfeshiny/tree/main/tests)
 
 # Wrap up
 
+## Additional tips
+
+1.  Whenever you hit an issue, add a quick testthat test for it!
+    -   It's a great way to prevent issues repeating themselves
+
+    -   Also allows you to slowly and steadily build up a set of checks that cover things you know could go wrong!
+2.  Start small
+    -   Don't feel like you need to write all of the tests immediately - it's a great way to lose lots of time in rabbit holes
+
+    -   Fewer, reliable tests that check a small amount of things well, are more valuable than a whopping suite of complicated and temperamental checks that check lots of things but add on lots of overhead
+3.  Don't feel like you need to re-test other packages functions
+    -   that's overkill, most packages already test their functions, so you can (mostly) trust them
+
+    -   however, it can be wise to do some research on the quality of the packages you're using...
+
+        -   has it been updated recently?
+
+        -   is it deployed on CRAN?
+
+        -   does it have good test coverage?
+
+        -   if in doubt get in touch with us and we can take a look (explore.statistics\@education.gov.uk)
+
 ## Remember
 
-Pass / fail tests will never replace all QA, you still need to use analytical judgement in QA.
-
-GIVEN - WHEN - THEN
-
-Don't feel like you need to re-test other packages functions, that's overkill, but do do some research on the quality of the packages you're using!
-
-Pass / fail tests are fantastic for giving you quick and effective feedback on your code, helping to speed up development and catch bugs early.
-
-## Support?
-
-If in doubt - ask the community!
-
-statistics.development\@education.gov.uk are also here to support with all things R and automation!
+1.  GIVEN - WHEN - THEN
+2.  Pass / fail tests are super quick to add and are fantastic for giving you fast, reliable feedback on your code, helping to speed up development and catch issues early
+3.  Pass / fail tests will never replace all QA, you still need to use analytical judgement in QA
+4.  If you can think of it, you can probably code it!
 
 ## Any questions?
 
 cameron.race\@education.gov.uk
 
-Slides made with Quarto
+Slides made with Quarto:
 
 -   [GitHub repository](https://github.com/dfe-analytical-services/pass-fail-qa-cc-20241120)
 
--   Slides themselves (deployed to GitHub pages)
+-   [Slides themselves (deployed to GitHub pages)](https://dfe-analytical-services.github.io/pass-fail-qa-cc-20241120/)
 
 -   [Get started on your own Quarto slides](https://quarto.org/docs/presentations/)

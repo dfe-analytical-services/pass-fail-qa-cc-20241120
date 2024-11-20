@@ -11,7 +11,7 @@
   <meta name="generator" content="quarto-1.5.57">
 
   <meta name="author" content="Cam Race">
-  <title>Automated pass / fail QA in R</title>
+  <title>Test that! No literally, testthat…</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -392,7 +392,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Automated pass / fail QA in R</h1>
+  <h1 class="title">Test that! No literally, testthat…</h1>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -403,10 +403,10 @@ Cam Race
 </div>
 
 </section>
-<section id="what-i-will-cover" class="slide level2">
-<h2>What I will cover</h2>
+<section id="what-i-hope-to-cover" class="slide level2">
+<h2>What I hope to cover</h2>
 <ul>
-<li class="fragment"><p>A quick overview of what is possible when testing</p>
+<li class="fragment"><p>A quick overview of what is possible when using testthat for quick pass / fail checks in</p>
 <ul>
 <li class="fragment"><p>R code (e.g.&nbsp;in analysis or pipelines)</p></li>
 <li class="fragment"><p>R Shiny applications</p></li>
@@ -415,35 +415,52 @@ Cam Race
 <li class="fragment"><p>Show a number of examples of testing with R code that</p>
 <ul>
 <li class="fragment"><p>R users can steal, adapt, and reuse</p></li>
-<li class="fragment"><p>Non R users or senior managers can use as inspiration when directing their teams QA</p></li>
+<li class="fragment"><p>Non R users or senior managers can use as inspiration when directing their teams quality assurance (QA)</p></li>
 </ul></li>
 </ul>
 </section>
 <section id="disclaimer-i-am-not-going-to" class="slide level2">
 <h2>Disclaimer: I am not going to</h2>
 <ul>
-<li class="fragment"><p>Show you through a specific project</p>
+<li class="fragment"><p>Show you through one specific project</p>
 <ul>
 <li class="fragment">Instead, I’ll compensate by scatter-gunning some examples in the hope they provide useful inspiration</li>
 </ul></li>
-<li class="fragment"><p>Teach you to become an analyst</p>
+<li class="fragment"><p>Teach you to QA</p>
 <ul>
-<li class="fragment">There are many aspects of QA that require analytical skills, experience and insight to assess and make judgement calls, you can’t do all QA with just pass / fail tests.</li>
+<li class="fragment">There are many aspects of QA that require analytical skills, experience and insight to assess and make judgement calls, you can’t do all QA with just pass / fail tests</li>
 </ul></li>
 <li class="fragment"><p>Teach you how to build R Shiny apps or R packages</p>
 <ul>
+<li class="fragment"><p>I will skim over some of the details of these</p></li>
 <li class="fragment"><p>Both could have multiple coffee and coding sessions in their own right</p></li>
 <li class="fragment"><p>Our very own Chris Dias has made some great updates to the Analysts’ Guide highlight R Shiny guidance [LINK]</p></li>
 <li class="fragment"><p>For R packages look no further than <a href="https://r-pkgs.org/">R packages by Hadley Wickham and Jennifer Bryan</a>, it is the Rosetta Stone of R package development</p></li>
+<li class="fragment"><p>Take a look at some relevant past coffee and coding sessions! [LINK]</p></li>
 </ul></li>
 </ul>
 </section>
-<section id="if-you-dont-yet-use-use-r" class="slide level2">
-<h2>If you don’t yet use use R</h2>
+<section id="if-you-want-to-get-more-confident-using-r" class="slide level2">
+<h2>If you want to get more confident using R</h2>
 <ul>
 <li class="fragment"><p>See our unit’s R workshops</p></li>
 <li class="fragment"><p>OR some of the many, great free online resources</p></li>
-<li class="fragment"><p>With copilot web now standard for everyone in DfE there’s no excuses for not giving it a go yourself. The best software developers don’t have lots of unique knowledge, they’re just usually the most willing to search for the answers to problems themselves instead of relying on others</p></li>
+<li class="fragment"><p>Remember, the best coders don’t have lots of unique knowledge, they’re just usually the most willing to search for the answers to problems themselves instead of relying on others, so get stuck in yourself and get curious!</p></li>
+</ul>
+</section>
+<section id="basic-example-of-what-were-going-to-look-at" class="slide level2">
+<h2>Basic example of what we’re going to look at</h2>
+<p>Many of you who’ve written R code before will have come across something like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>my_table <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="st">""</span>)</span>
+<span id="cb1-2"><a href=""></a></span>
+<span id="cb1-3"><a href=""></a><span class="cf">if</span>(<span class="fu">nrow</span>(my_table) <span class="sc">==</span> <span class="dv">0</span>){</span>
+<span id="cb1-4"><a href=""></a>  <span class="fu">stop</span>(<span class="st">"There are no rows in the table, this can't be right!"</span>)</span>
+<span id="cb1-5"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li class="fragment"><p>This is an example of pass / fail automated QA!</p></li>
+<li class="fragment"><p>It checks for a condition and then if it meets a criteria it stops the code and tries to give a semi-informative error</p></li>
 </ul>
 </section>
 <section id="why-use-automated-pass-fail-checks-as-a-part-of-qa" class="slide level2">
@@ -456,23 +473,68 @@ Cam Race
 <li class="fragment"><p>easy to understand</p></li>
 </ul></li>
 <li class="fragment"><p>They are the best way to start including simple automated checks into your code and data with minimal extra time or overhead to your processes</p></li>
-<li class="fragment"><p>Today I will show you a number of examples of how you can use them, in the hope it inspires you to start adding your own pass / fail checks!</p></li>
+</ul>
+</section>
+<section id="working-as-a-part-of-a-team" class="slide level2">
+<h2>Working as a part of a team?</h2>
+<ul>
+<li class="fragment"><p>Adding in quick automated pass fail checks will</p>
+<ul>
+<li class="fragment"><p>Make it easier for everyone to run the same code reliably</p></li>
+<li class="fragment"><p>Make it easier for everyone to understand what the code is supposed to be doing</p></li>
+<li class="fragment"><p>Cut down the time when investigating issues</p></li>
+<li class="fragment"><p>Gives assurance when reviewing each others code that you’re making the same assumptions</p></li>
+<li class="fragment"><p>All because it clearly and simply documents and tests your assumptions</p></li>
+</ul></li>
+<li class="fragment"><p>You can also use them to add in catches for steps that require manual intervention e.g.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a>countries <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="st">""</span>)</span>
+<span id="cb2-2"><a href=""></a></span>
+<span id="cb2-3"><a href=""></a><span class="cf">if</span>(<span class="fu">nrow</span>(countries) <span class="sc">==</span> <span class="dv">0</span>){</span>
+<span id="cb2-4"><a href=""></a>  <span class="fu">stop</span>(<span class="st">"You've forgotten to add countries, run the countries_import.R script before continuing"</span>)</span>
+<span id="cb2-5"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></li>
 </ul>
 </section>
 <section id="working-alone" class="slide level2">
 <h2>Working alone?</h2>
-
-<img data-src="img/frederick_taxi_driver.png" alt="'You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'" class="r-stretch quarto-figure-center"><p class="caption">‘You talkin’ to me? You talkin’ to me? Well I’m the only one here. Who the duck do you think you’re talking to?’</p><div class="footer">
-<p>Frederick De Niro, 2024</p>
+<ul>
+<li class="fragment"><div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<figcaption>‘You talkin’ to me? You talkin’ to me? Well I’m the only one here. Who the duck do you think you’re talking to?’</figcaption>
+<p><img data-src="img/frederick_taxi_driver.png" alt="'You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'" width="400"></p>
+</figure>
 </div>
+</div></li>
+</ul>
+<!-- -->
+<ul>
+<li class="fragment"><p>Adding in quick automated pass fail checks will</p>
+<ul>
+<li class="fragment"><p>Make it easier for you to run the same code reliably</p></li>
+<li class="fragment"><p>Make it easier for you to understand what the code is supposed to be doing</p></li>
+<li class="fragment"><p>Cut down the time when investigating issues</p></li>
+<li class="fragment"><p>Gives assurance when writing code that it and the outputs are being QA’d consistently</p></li>
+</ul></li>
+</ul>
 </section>
 <section id="packages-well-use" class="slide level2">
 <h2>Packages we’ll use</h2>
 <ul>
-<li class="fragment"><p><a href="https://testthat.r-lib.org/">testthat</a></p></li>
-<li class="fragment"><p><a href="https://rstudio.github.io/shinytest2/">shinytest2</a> (Side note: Are you still using the original shinytest? Stop. Migrate to shinytest2 now.)</p></li>
+<li class="fragment"><p>For everyone</p>
+<ul>
+<li class="fragment"><a href="https://testthat.r-lib.org/">testthat</a></li>
+</ul></li>
+<li class="fragment"><p>For R Shiny developers</p>
+<ul>
+<li class="fragment"><a href="https://rstudio.github.io/shinytest2/">shinytest2</a> (Side note: Are you still using the original shinytest? Stop. Migrate to shinytest2 now.)</li>
+</ul></li>
+<li class="fragment"><p>For R package developers</p>
+<ul>
 <li class="fragment"><p><a href="https://usethis.r-lib.org/">usethis</a></p></li>
 <li class="fragment"><p><a href="https://devtools.r-lib.org/">devtools</a></p></li>
+</ul></li>
 <li class="fragment"><p>Bonus levels:</p>
 <ul>
 <li class="fragment"><p><a href="https://lintr.r-lib.org/">lintr</a></p></li>
@@ -481,8 +543,8 @@ Cam Race
 </ul></li>
 </ul>
 </section>
-<section id="let-us-begin" class="title-slide slide level1 center">
-<h1>Let us begin</h1>
+<section id="a-whole-new-world" class="title-slide slide level1 center">
+<h1>A whole new world…</h1>
 
 <img data-src="img/frederick_r_magic_carpet.png" class="quarto-figure quarto-figure-center r-stretch" alt="A mediocre visual pun smushing R with Disney's Aladdin"></section>
 
@@ -495,20 +557,11 @@ Cam Race
 <h2>Testing principles</h2>
 <div class="fragment">
 <p>You should always think of automated tests as three phases</p>
-<ul>
-<li class="fragment"><p>GIVEN</p>
-<ul>
-<li class="fragment">Set up a context</li>
-</ul></li>
-<li class="fragment"><p>WHEN</p>
-<ul>
-<li class="fragment">Do a thing</li>
-</ul></li>
-<li class="fragment"><p>THEN</p>
-<ul>
-<li class="fragment">Expect a certain result</li>
-</ul></li>
-</ul>
+<ol type="1">
+<li class="fragment">GIVEN</li>
+<li class="fragment">WHEN</li>
+<li class="fragment">THEN</li>
+</ol>
 </div>
 </section>
 <section id="testing-principles-1" class="slide level2">
@@ -530,42 +583,43 @@ Cam Race
 </section>
 <section id="testing-principles---testthat-example" class="slide level2">
 <h2>Testing principles - testthat example</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">library</span>(testthat)</span>
-<span id="cb1-2"><a href=""></a></span>
-<span id="cb1-3"><a href=""></a><span class="co"># GIVEN</span></span>
-<span id="cb1-4"><a href=""></a>x <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb1-5"><a href=""></a>y <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb1-6"><a href=""></a></span>
-<span id="cb1-7"><a href=""></a><span class="co"># WHEN</span></span>
-<span id="cb1-8"><a href=""></a>z <span class="ot">&lt;-</span> <span class="fu">sum</span>(x, y)</span>
-<span id="cb1-9"><a href=""></a></span>
-<span id="cb1-10"><a href=""></a><span class="co"># THEN</span></span>
-<span id="cb1-11"><a href=""></a><span class="fu">expect_equal</span>(z, <span class="dv">5</span>) <span class="co"># function from testthat</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="fu">library</span>(testthat)</span>
+<span id="cb3-2"><a href=""></a></span>
+<span id="cb3-3"><a href=""></a><span class="co"># GIVEN</span></span>
+<span id="cb3-4"><a href=""></a>x <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb3-5"><a href=""></a>y <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb3-6"><a href=""></a></span>
+<span id="cb3-7"><a href=""></a><span class="co"># WHEN</span></span>
+<span id="cb3-8"><a href=""></a>z <span class="ot">&lt;-</span> <span class="fu">sum</span>(x, y)</span>
+<span id="cb3-9"><a href=""></a></span>
+<span id="cb3-10"><a href=""></a><span class="co"># THEN</span></span>
+<span id="cb3-11"><a href=""></a><span class="co"># Instead of an if statement we use the expect_* functions from testthat</span></span>
+<span id="cb3-12"><a href=""></a><span class="fu">expect_equal</span>(z, <span class="dv">5</span>) </span>
+<span id="cb3-13"><a href=""></a></span>
+<span id="cb3-14"><a href=""></a><span class="co"># If this passes nothing happens, it doesn't print to the console, and the rest of your code will run as normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="testing-principles---tidied-example" class="slide level2">
 <h2>Testing principles - tidied example</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a><span class="fu">library</span>(testthat)</span>
-<span id="cb2-2"><a href=""></a></span>
-<span id="cb2-3"><a href=""></a><span class="co"># GIVEN</span></span>
-<span id="cb2-4"><a href=""></a>x <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb2-5"><a href=""></a>y <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb2-6"><a href=""></a></span>
-<span id="cb2-7"><a href=""></a><span class="co"># WHEN &amp; THEN</span></span>
-<span id="cb2-8"><a href=""></a><span class="fu">expect_equal</span>(<span class="fu">sum</span>(x, y), <span class="dv">5</span>)</span>
-<span id="cb2-9"><a href=""></a></span>
-<span id="cb2-10"><a href=""></a><span class="co"># This passes, so nothing happens, it doesn't print to the console and the rest of your code will run as normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="fu">library</span>(testthat)</span>
+<span id="cb4-2"><a href=""></a></span>
+<span id="cb4-3"><a href=""></a><span class="co"># GIVEN</span></span>
+<span id="cb4-4"><a href=""></a>x <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb4-5"><a href=""></a>y <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb4-6"><a href=""></a></span>
+<span id="cb4-7"><a href=""></a><span class="co"># WHEN &amp; THEN (often written this way for conciseness)</span></span>
+<span id="cb4-8"><a href=""></a><span class="fu">expect_equal</span>(<span class="fu">sum</span>(x, y), <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="what-if-it-fails" class="slide level2">
 <h2>What if it fails?</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="fu">library</span>(testthat)</span>
-<span id="cb3-2"><a href=""></a></span>
-<span id="cb3-3"><a href=""></a><span class="co"># GIVEN</span></span>
-<span id="cb3-4"><a href=""></a>x <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb3-5"><a href=""></a>y <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="co"># uh-oh spaghetti-o</span></span>
-<span id="cb3-6"><a href=""></a></span>
-<span id="cb3-7"><a href=""></a><span class="co"># WHEN &amp; THEN</span></span>
-<span id="cb3-8"><a href=""></a><span class="fu">expect_equal</span>(<span class="fu">sum</span>(x, y), <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a><span class="fu">library</span>(testthat)</span>
+<span id="cb5-2"><a href=""></a></span>
+<span id="cb5-3"><a href=""></a><span class="co"># GIVEN</span></span>
+<span id="cb5-4"><a href=""></a>x <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb5-5"><a href=""></a>y <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="co"># uh-oh spaghetti-o</span></span>
+<span id="cb5-6"><a href=""></a></span>
+<span id="cb5-7"><a href=""></a><span class="co"># WHEN &amp; THEN</span></span>
+<span id="cb5-8"><a href=""></a><span class="fu">expect_equal</span>(<span class="fu">sum</span>(x, y), <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -576,58 +630,362 @@ Cam Race
 </div>
 <p>This throws an error and stops your code - this is particularly helpful if you have certain expectations that later code relies on, and allows you to fix the problem before it compounds and causes lots of later errors.</p>
 </section>
-<section id="some-more-examples" class="slide level2">
-<h2>Some more examples</h2>
-<p>As it says</p>
+<section id="examples" class="slide level2">
+<h2>Examples</h2>
+<p>Catching if I need to take a manual action</p>
+<p>TODO: dig out analytics example</p>
 </section>
-<section id="the-good" class="slide level2">
-<h2>The good</h2>
+<section id="example-data-you-can-use-yourself" class="slide level2">
+<h2>Example data you can use yourself</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="fu">head</span>(dplyr<span class="sc">::</span>starwars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 14
+  name      height  mass hair_color skin_color eye_color birth_year sex   gender
+  &lt;chr&gt;      &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; 
+1 Luke Sky…    172    77 blond      fair       blue            19   male  mascu…
+2 C-3PO        167    75 &lt;NA&gt;       gold       yellow         112   none  mascu…
+3 R2-D2         96    32 &lt;NA&gt;       white, bl… red             33   none  mascu…
+4 Darth Va…    202   136 none       white      yellow          41.9 male  mascu…
+5 Leia Org…    150    49 brown      light      brown           19   fema… femin…
+6 Owen Lars    178   120 brown, gr… light      blue            52   male  mascu…
+# ℹ 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+#   vehicles &lt;list&gt;, starships &lt;list&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="co"># Could also do it this way</span></span>
+<span id="cb9-2"><a href=""></a><span class="co">#</span></span>
+<span id="cb9-3"><a href=""></a><span class="co"># library(dplyr)</span></span>
+<span id="cb9-4"><a href=""></a><span class="co"># head(starwars)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
-<section id="the-bad" class="slide level2">
-<h2>The bad</h2>
+<section id="examples-on-star-wars-data" class="slide level2">
+<h2>Examples on star wars data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="co"># Check that df_starwars is a data frame</span></span>
+<span id="cb10-2"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_true</span>(dplyr<span class="sc">::</span>starwars <span class="sc">|&gt;</span> <span class="fu">is.data.frame</span>())</span>
+<span id="cb10-3"><a href=""></a></span>
+<span id="cb10-4"><a href=""></a><span class="co"># An alternative that I know will fail</span></span>
+<span id="cb10-5"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_true</span>(dplyr<span class="sc">::</span>starwars <span class="sc">|&gt;</span> <span class="fu">is.vector</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : is.vector(dplyr::starwars) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE </code></pre>
+</div>
+</div>
+<ul>
+<li class="fragment"><p>These kind of class / type checks are particularly useful for</p>
+<ul>
+<li class="fragment"><p>Catching issues early in processes to prevent compound errors</p></li>
+<li class="fragment"><p>Quality checking output data</p></li>
+</ul></li>
+</ul>
 </section>
-<section id="the-ugly" class="slide level2">
-<h2>The ugly</h2>
+<section id="examples-on-star-wars-data-1" class="slide level2">
+<h2>Examples on star wars data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="co"># Check that the height column is numeric</span></span>
+<span id="cb12-2"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_true</span>(dplyr<span class="sc">::</span>starwars<span class="sc">$</span>height <span class="sc">|&gt;</span> <span class="fu">is.numeric</span>())</span>
+<span id="cb12-3"><a href=""></a></span>
+<span id="cb12-4"><a href=""></a><span class="co"># An alternative that I know will fail</span></span>
+<span id="cb12-5"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_true</span>(dplyr<span class="sc">::</span>starwars<span class="sc">$</span>height <span class="sc">|&gt;</span> <span class="fu">is.character</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : is.character(dplyr::starwars$height) is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE </code></pre>
+</div>
+</div>
 </section>
-<section id="expect_-functions" class="slide level2">
-<h2>expect_* functions</h2>
-<p>Some links / text for a range of the expect functions</p>
+<section id="examples-on-star-wars-data-2" class="slide level2">
+<h2>Examples on star wars data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a><span class="co"># Check that no characters have a height over 500cm</span></span>
+<span id="cb14-2"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_lt</span>(dplyr<span class="sc">::</span>starwars<span class="sc">$</span>height <span class="sc">|&gt;</span> <span class="fu">max</span>(<span class="at">na.rm=</span><span class="cn">TRUE</span>), <span class="dv">500</span>)</span>
+<span id="cb14-3"><a href=""></a></span>
+<span id="cb14-4"><a href=""></a><span class="co"># An example I know will fail</span></span>
+<span id="cb14-5"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_gt</span>(dplyr<span class="sc">::</span>starwars<span class="sc">$</span>height <span class="sc">|&gt;</span> <span class="fu">max</span>(<span class="at">na.rm=</span><span class="cn">TRUE</span>), <span class="dv">500</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : max(dplyr::starwars$height, na.rm = TRUE) is not strictly more than 500. Difference: -236</code></pre>
+</div>
+</div>
+<ul>
+<li class="fragment">Again, this kind of check can be easily applied to sense-check your data ranges, before, during and after processing</li>
+</ul>
+</section>
+<section id="examples-on-star-wars-data-3" class="slide level2">
+<h2>Examples on star wars data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a><span class="co"># Check that there are at least unique 50 characters</span></span>
+<span id="cb16-2"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_gte</span>(</span>
+<span id="cb16-3"><a href=""></a>  dplyr<span class="sc">::</span>starwars <span class="sc">|&gt;</span> </span>
+<span id="cb16-4"><a href=""></a>    dplyr<span class="sc">::</span><span class="fu">distinct</span>(name) <span class="sc">|&gt;</span> </span>
+<span id="cb16-5"><a href=""></a>    <span class="fu">nrow</span>(), </span>
+<span id="cb16-6"><a href=""></a>  <span class="dv">50</span></span>
+<span id="cb16-7"><a href=""></a>)</span>
+<span id="cb16-8"><a href=""></a></span>
+<span id="cb16-9"><a href=""></a><span class="co"># An example I know will fail</span></span>
+<span id="cb16-10"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_lte</span>(</span>
+<span id="cb16-11"><a href=""></a>  dplyr<span class="sc">::</span>starwars <span class="sc">|&gt;</span> </span>
+<span id="cb16-12"><a href=""></a>    dplyr<span class="sc">::</span><span class="fu">distinct</span>(name) <span class="sc">|&gt;</span> </span>
+<span id="cb16-13"><a href=""></a>    <span class="fu">nrow</span>(), </span>
+<span id="cb16-14"><a href=""></a>  <span class="dv">50</span></span>
+<span id="cb16-15"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : nrow(dplyr::distinct(dplyr::starwars, name)) is not less than 50. Difference: 37</code></pre>
+</div>
+</div>
+<ul>
+<li class="fragment">This could be particularly useful if you want to have a quick check to make sure you have the right number of LA’s and haven’t accidentally lost any in a join or aggregation</li>
+</ul>
+</section>
+<section id="examples-on-star-wars-data-4" class="slide level2">
+<h2>Examples on star wars data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a><span class="co"># Check that a common problematic rogue entry isn't there</span></span>
+<span id="cb18-2"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_in</span>(</span>
+<span id="cb18-3"><a href=""></a>  <span class="st">"Professor Charles Xavier"</span>,</span>
+<span id="cb18-4"><a href=""></a>  dplyr<span class="sc">::</span>starwars<span class="sc">$</span>name</span>
+<span id="cb18-5"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in !dplyr::starwars$name : invalid argument type</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href=""></a><span class="co"># Check that if all items in a vector are present</span></span>
+<span id="cb20-2"><a href=""></a>testthat<span class="sc">::</span><span class="fu">expect_contains</span>(</span>
+<span id="cb20-3"><a href=""></a>  dplyr<span class="sc">::</span>starwars<span class="sc">$</span>name, </span>
+<span id="cb20-4"><a href=""></a>  <span class="sc">!</span><span class="fu">c</span>(<span class="st">"Professor Charles Xavier"</span>, <span class="st">"C-3PO"</span>, <span class="st">"R2-D2"</span>)</span>
+<span id="cb20-5"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in !c("Professor Charles Xavier", "C-3PO", "R2-D2") : 
+  invalid argument type</code></pre>
+</div>
+</div>
+</section>
+<section id="example-on-locations-data" class="slide level2">
+<h2>Example on locations data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href=""></a><span class="fu">head</span>(dfeR<span class="sc">::</span>wd_pcon_lad_la_rgn_ctry)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  first_available_year_included most_recent_year_included
+1                          2017                      2017
+2                          2017                      2017
+3                          2017                      2020
+4                          2017                      2017
+5                          2017                      2020
+6                          2017                      2017
+               ward_name  pcon_name              lad_name               la_name
+1               Bastwell  Blackburn Blackburn with Darwen Blackburn with Darwen
+2                Ormesby     Redcar  Redcar and Cleveland  Redcar and Cleveland
+3            Burn Valley Hartlepool            Hartlepool            Hartlepool
+4 Beardwood with Lammack  Blackburn Blackburn with Darwen Blackburn with Darwen
+5               De Bruce Hartlepool            Hartlepool            Hartlepool
+6           St Germain's     Redcar  Redcar and Cleveland  Redcar and Cleveland
+  region_name country_name ward_code pcon_code  lad_code new_la_code
+1  North West      England E05001621 E14000570 E06000008   E06000008
+2  North East      England E05001518 E14000891 E06000003   E06000003
+3  North East      England E05008942 E14000733 E06000001   E06000001
+4  North West      England E05001622 E14000570 E06000008   E06000008
+5  North East      England E05008943 E14000733 E06000001   E06000001
+6  North East      England E05001519 E14000891 E06000003   E06000003
+  region_code country_code
+1   E12000002    E92000001
+2   E12000001    E92000001
+3   E12000001    E92000001
+4   E12000002    E92000001
+5   E12000001    E92000001
+6   E12000001    E92000001</code></pre>
+</div>
+</div>
+</section>
+<section id="example-on-locations-data-1" class="slide level2">
+<h2>Example on locations data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href=""></a>lookup <span class="ot">&lt;-</span> dfeR<span class="sc">::</span>wd_pcon_lad_la_rgn_ctry</span>
+<span id="cb24-2"><a href=""></a></span>
+<span id="cb24-3"><a href=""></a><span class="co"># Check that the lookup file contains all LAs in England in 2024</span></span>
+<span id="cb24-4"><a href=""></a><span class="fu">expect_contains</span>(</span>
+<span id="cb24-5"><a href=""></a>  lookup<span class="sc">$</span>la_name,</span>
+<span id="cb24-6"><a href=""></a>  dfeR<span class="sc">::</span><span class="fu">fetch_las</span>(<span class="at">year =</span> <span class="dv">2024</span>, <span class="at">countries =</span> <span class="st">"England"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb24-7"><a href=""></a>    <span class="fu">pull</span>(la_name)</span>
+<span id="cb24-8"><a href=""></a>)</span>
+<span id="cb24-9"><a href=""></a></span>
+<span id="cb24-10"><a href=""></a><span class="co"># Example of it failing</span></span>
+<span id="cb24-11"><a href=""></a><span class="fu">expect_contains</span>(</span>
+<span id="cb24-12"><a href=""></a>  lookup<span class="sc">$</span>la_name,</span>
+<span id="cb24-13"><a href=""></a>  <span class="st">"Westeros"</span></span>
+<span id="cb24-14"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : lookup$la_name (`actual`) doesn't fully contain all the values in "Westeros" (`expected`).
+* Missing from `actual`: "Westeros"
+* Present in `actual`:   "Blackburn with Darwen", "Redcar and Cleveland", "Hartlepool", "Blackburn with Darwen", "Hartlepool", "Redcar and Cleveland", "Blackburn with Darwen", "Hartlepool", "Redcar and Cleveland", ...</code></pre>
+</div>
+</div>
+<ul>
+<li class="fragment"><p>An example where this might be helpful is when doing analysis across boundary changes, and you’ve had a specific issue with a rogue location not appearing in your latest year of data when it should be there</p></li>
+<li class="fragment"><p>It’s quick and easy to add specific checks to give you and others relying on your analysis peace of mind that those issues can’t be repeated!</p></li>
+</ul>
+</section>
+<section id="most-common-expect_-functions" class="slide level2">
+<h2>Most common expect_* functions</h2>
+<ul>
+<li class="fragment"><p>expect_equal() / expect_identical()</p></li>
+<li class="fragment"><p>expect_true() / expect_false()</p></li>
+<li class="fragment"><p>expect_lt() / expect_lte() / expect_gt / expect_gte()</p></li>
+<li class="fragment"><p>expect_contains() / expect_in()</p></li>
+<li class="fragment"><p>expect_error() / expect_warning() / expect_message()</p></li>
+<li class="fragment"><p>expect_no_error() / expect_no_warning() / expect_no_message()</p></li>
+<li class="fragment"><p>You can even build <a href="https://testthat.r-lib.org/articles/custom-expectation.html">custom expectations</a></p></li>
+<li class="fragment"><p>Full list and documentation on the <a href="https://testthat.r-lib.org/reference/index.html">testthat site</a></p></li>
+</ul>
+</section>
+<section id="when-and-where-should-i-do-this" class="slide level2">
+<h2>When and where should I do this?</h2>
+<p>Really you could be doing this before, during, and after your analysis code! For example, you might already do this kind of thing in SQL scripts</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><a href=""></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> my_table</span>
+<span id="cb26-2"><a href=""></a></span>
+<span id="cb26-3"><a href=""></a><span class="co">-- 1,551 rows</span></span>
+<span id="cb26-4"><a href=""></a></span>
+<span id="cb26-5"><a href=""></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> (la_name) <span class="kw">FROM</span> my_table</span>
+<span id="cb26-6"><a href=""></a></span>
+<span id="cb26-7"><a href=""></a><span class="co">-- 153 rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li class="fragment">This is how you should think of these checks, a way of regularly documenting your assumptions through the code!</li>
+</ul>
+</section>
+<section id="when-and-where-should-i-do-this-1" class="slide level2">
+<h2>When and where should I do this?</h2>
+<div class="sourceCode" id="cb27"><pre class="sourceCode numberSource r R number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href=""></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb27-2"><a href=""></a><span class="fu">library</span>(testthat)</span>
+<span id="cb27-3"><a href=""></a></span>
+<span id="cb27-4"><a href=""></a><span class="co"># Import data</span></span>
+<span id="cb27-5"><a href=""></a>raw_data <span class="ot">&lt;-</span> starwars</span>
+<span id="cb27-6"><a href=""></a></span>
+<span id="cb27-7"><a href=""></a><span class="co"># Check raw data has at least 50 rows</span></span>
+<span id="cb27-8"><a href=""></a><span class="fu">expect_gte</span>(<span class="fu">nrow</span>(raw_data), <span class="dv">50</span>)</span>
+<span id="cb27-9"><a href=""></a></span>
+<span id="cb27-10"><a href=""></a><span class="co"># Process data to aggregate by species</span></span>
+<span id="cb27-11"><a href=""></a>species_summary <span class="ot">&lt;-</span> raw_data <span class="sc">|&gt;</span> </span>
+<span id="cb27-12"><a href=""></a>  <span class="fu">group_by</span>(species) <span class="sc">|&gt;</span> </span>
+<span id="cb27-13"><a href=""></a>  <span class="fu">summarise</span>(</span>
+<span id="cb27-14"><a href=""></a>    <span class="at">avg_height =</span> <span class="fu">mean</span>(height, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-15"><a href=""></a>    <span class="at">avg_mass =</span> <span class="fu">mean</span>(mass, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb27-16"><a href=""></a>  )</span>
+<span id="cb27-17"><a href=""></a></span>
+<span id="cb27-18"><a href=""></a><span class="co"># Check the processing</span></span>
+<span id="cb27-19"><a href=""></a><span class="fu">expect_equal</span>(<span class="fu">ncol</span>(species_summary), <span class="dv">3</span>)</span>
+<span id="cb27-20"><a href=""></a><span class="fu">expect_equal</span>(</span>
+<span id="cb27-21"><a href=""></a>  <span class="fu">nrow</span>(species_summary),</span>
+<span id="cb27-22"><a href=""></a>  raw_data<span class="sc">$</span>species <span class="sc">|&gt;</span> </span>
+<span id="cb27-23"><a href=""></a>    <span class="fu">unique</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb27-24"><a href=""></a>    <span class="fu">length</span>()</span>
+<span id="cb27-25"><a href=""></a>)</span>
+<span id="cb27-26"><a href=""></a></span>
+<span id="cb27-27"><a href=""></a><span class="co"># Imagine the final output is the summary table</span></span>
+<span id="cb27-28"><a href=""></a><span class="co"># Sense check the output data</span></span>
+<span id="cb27-29"><a href=""></a><span class="fu">expect_true</span>(species_summary<span class="sc">$</span>avg_mass <span class="sc">|&gt;</span> <span class="fu">is.numeric</span>())</span>
+<span id="cb27-30"><a href=""></a><span class="fu">expect_true</span>(<span class="fu">all</span>(<span class="sc">!</span><span class="fu">is.nan</span>(species_summary<span class="sc">$</span>avg_mass)))</span>
+<span id="cb27-31"><a href=""></a><span class="fu">expect_gte</span>(species_summary<span class="sc">$</span>avg_mass <span class="sc">|&gt;</span> <span class="fu">min</span>(), <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="when-and-where-should-i-do-this-2" class="slide level2">
+<h2>When and where should I do this?</h2>
+<p>For more examples of code using this have a look at:</p>
+<ul>
+<li class="fragment"><p>RAP knowledge share on QA - Fran Elliot in particular showed some good examples</p></li>
+<li class="fragment"><p>Coffee and coding on testing R code - ?</p></li>
+</ul>
 </section></section>
 <section>
 <section id="testing-r-shiny-applications" class="title-slide slide level1 center">
 <h1>Testing R Shiny applications</h1>
 
 </section>
-<section id="different-forms-of-tests" class="slide level2">
-<h2>Different forms of tests</h2>
-<p>Show the pyramid</p>
-</section>
 <section id="different-r-shiny-tests" class="slide level2">
 <h2>Different R Shiny tests</h2>
-<p>testthat is great for unit tests</p>
-<p>Shiny has testServer built in already</p>
-<p>shinytest2 gives you the full end to end tests (also known as UI tests)</p>
+<p>Testing an application is different to analysis or pipelines, you’ll often have a ‘suite’ or ‘suites’ of tests that you run periodically in bulk to quickly check the latest version of the code still does all the things it used to.</p>
+<p>Test types are:</p>
+<ol type="1">
+<li class="fragment">Unit tests
 <ul>
-<li class="fragment">UI = User Interface</li>
+<li class="fragment"><p>Low level</p></li>
+<li class="fragment"><p>Check the behaviour of specific functions</p></li>
+<li class="fragment"><p>testthat is ideal for this</p></li>
+<li class="fragment"><p>Very quick to create and to run</p></li>
+</ul></li>
+<li class="fragment">Integration tests
+<ul>
+<li class="fragment"><p>Medium level, integrating a number of moving parts</p></li>
+<li class="fragment"><p>Shiny has testServer() built in already</p></li>
+<li class="fragment"><p>Pretty quick to run, bit more effort to set up</p></li>
+</ul></li>
+<li class="fragment">UI (User Interface) or ‘End to end’ tests
+<ul>
+<li class="fragment"><p>Full test of the user experience and all components</p></li>
+<li class="fragment"><p>shinytest2 gives you the full end to end tests (also known as UI tests)</p></li>
+<li class="fragment"><p>Take longer to run, and a lot more effort to set up</p></li>
+</ul></li>
+</ol>
+</section>
+<section id="different-forms-of-tests" class="slide level2">
+<h2>Different forms of tests</h2>
+
+<img data-src="img/testing-pyramid.webp" class="r-stretch"></section>
+<section id="running-the-tests" class="slide level2">
+<h2>Running the tests</h2>
+<ul>
+<li class="fragment"><p>In an R Shiny application you’ll usually have a tests/ folder that contains all of your test scripts</p></li>
+<li class="fragment"><p>Assuming you have shinytest2 installed, you can automatically run all of the above types of tests together using <code>shinytest2::test_app()</code></p></li>
 </ul>
+</section>
+<section id="demo-app" class="slide level2">
+<h2>Demo app</h2>
+<p>GitHub repository [TODO]</p>
 </section></section>
-<section id="bonus-continuous-integration" class="title-slide slide level1 center">
-<h1>Bonus: Continuous integration</h1>
-<p>Who doesn’t love bonus content?</p>
-<p>Here as a bonus as it actually applies to multiple types of projects, not just R Shiny applications.</p>
-<p>If your code is open and hosted in GitHub (i.e.&nbsp;is safe to share publicly), then you get GitHub Actions for free, and it’s incredibly powerful.</p>
-<p>What is CI</p>
-<p>Examples of how we have it set up</p>
-<p>Screenshots of the good, the bad and the ugly</p>
-</section>
+<section>
+<section id="bonus-continuous-integration-ci" class="title-slide slide level1 center">
+<h1>Bonus: Continuous integration (CI)</h1>
 
-<section id="bonus-linting" class="title-slide slide level1 center">
-<h1>Bonus: linting</h1>
-<p>Applicable to all projects, though included here as a bonus as it’s particularly important for R packages</p>
-<p>Mention lintr and styler, show some before / after examples and also example errors / checks.</p>
-<p>Screenshots of the good, the bad and the ugly</p>
 </section>
-
+<section id="bonus-continuous-integration-ci-1" class="slide level2">
+<h2>Bonus: Continuous integration (CI)</h2>
+<ul>
+<li class="fragment"><p>Who doesn’t love bonus content? This is here as a bonus as it actually applies to multiple types of projects, not just R Shiny applications.</p></li>
+<li class="fragment"><p>Continuous integration is</p>
+<ul>
+<li class="fragment"><p>the practice of integrating code changes frequently and ensuring that the integrated codebase is in a workable state</p></li>
+<li class="fragment"><p>For our purposes, this means that every time we make a new version of the code, tests are run automatically against that code, speeding up the process!</p></li>
+</ul></li>
+<li class="fragment"><p>If your code is open and hosted in GitHub (i.e.&nbsp;is safe to share publicly), then you get GitHub Actions for free, and it’s incredibly powerful</p></li>
+</ul>
+<!-- -->
+<ul>
+<li class="fragment"><p>Free access to virtual machines that will run and test your code for you</p>
+<ul>
+<li class="fragment"><p>A free way to automate code scripts on Git events (commits / pushes / PRs) or on a scheduled job (e.g.&nbsp;once everyday at midnight)</p></li>
+<li class="fragment"><p>Integrate your tests with version control processes, so you have a clear audit trail and can proactively prevent issues from getting to your live application</p></li>
+</ul></li>
+<li class="fragment"><p>This is particularly useful where you have specific test folders or scripts that you want to run periodically against a ‘product’ but not inline in the actual code, e.g.&nbsp;R Shiny applications, R packages, deployed R models etc</p></li>
+</ul>
+</section>
+<section id="example-of-ci" class="slide level2">
+<h2>Example of CI</h2>
+<p>For an example Shiny app that runs continuous integration, have a look at the <a href="https://github.com/dfe-analytical-services/dfe-published-data-qa">explore education statistics data screener on GitHub</a>.</p>
+</section></section>
 <section>
 <section id="testing-r-packages" class="title-slide slide level1 center">
 <h1>Testing R packages</h1>
@@ -635,67 +993,121 @@ Cam Race
 </section>
 <section id="what-is-an-r-package" class="slide level2">
 <h2>What is an R package</h2>
-<p>Some examples of how you already use them (library call and then do some stuff to a data frame)</p>
-</section>
-<section id="what-does-a-package-look-like" class="slide level2">
-<h2>What does a package look like?</h2>
-<p>Demo using dfeR and the comma_sep function against just writing a function.</p>
-<p>Think of it as being able to reuse others functions and having documentation on how they work</p>
-<p>A great reason why structuring code as an R package can be helpful even just for pipelines within teams - see Jacob’s C+C (or Matt Jago?) from a few years ago for more details.</p>
-</section>
-<section id="unit-tests" class="slide level2">
-<h2>Unit tests</h2>
-<p>Show some examples on the same functions</p>
-</section>
-<section id="r-cmd-check" class="slide level2">
-<h2>R CMD Check</h2>
-<p>The big cheese of the checks for R packages.</p>
-<p>So much so it has it’s own function and keyboard shortcut in R Studio - Ctrl-Shift-E.</p>
-<p>If you do one test on an R package it should be this</p>
-<p>Some background on what it covers, any package hoping to get to CRAN should be running this as a minimum.</p>
-<p>Example issues it can pick up.</p>
-<p>Setting it up for an R package hosted in GitHub is easy.</p>
-</section>
-<section id="what-checks-have-we-used-on-dfeshiny" class="slide level2">
-<h2>What checks have we used on dfeshiny?</h2>
-<p>Custom unit tests</p>
-<p>GitHub actions:</p>
+<p>Every R user will have used some R packages at some point. For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href=""></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <ul>
-<li class="fragment"><p>R CMD check</p>
-<ul>
-<li class="fragment"><p>Our tests</p></li>
-<li class="fragment"><p>linting</p></li>
-<li class="fragment"><p>Spelling</p></li>
-<li class="fragment"><p>General package checks</p></li>
-</ul></li>
-<li class="fragment"><p>Example dashboard running shinytest2 checks</p></li>
-<li class="fragment"></li>
+<li class="fragment"><p>This loads all of the functions that are premade in dplyr, ready into your R session for you to use!</p></li>
+<li class="fragment"><p>It’s similar conceptually to having a <code>functions.R</code> script in your project and then running <code>source("functions.R")</code> so you can make use of the functions!</p></li>
 </ul>
+</section>
+<section id="what-does-a-package-actually-look-like" class="slide level2">
+<h2>What does a package actually look like?</h2>
+<p>Think of it as being able to reuse others functions and having documentation on how they work</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href=""></a><span class="fu">library</span>(dfeR)</span>
+<span id="cb29-2"><a href=""></a></span>
+<span id="cb29-3"><a href=""></a><span class="fu">comma_sep</span>(<span class="dv">3000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "3,000"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href=""></a>comma_sep</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>function(number,
+                      nsmall = 0L) {
+  format(number,
+    big.mark = ",", nsmall = nsmall, trim = TRUE,
+    scientific = FALSE
+  )
+}
+&lt;bytecode: 0x000001c5f33a8be0&gt;
+&lt;environment: namespace:dfeR&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="what-does-code-in-a-package-actually-look-like" class="slide level2">
+<h2>What does code in a package actually look like?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href=""></a><span class="co">#' Comma separate</span></span>
+<span id="cb33-2"><a href=""></a><span class="co">#'</span></span>
+<span id="cb33-3"><a href=""></a><span class="co">#' @description</span></span>
+<span id="cb33-4"><a href=""></a><span class="co">#' Adds separating commas to big numbers. If a value is not numeric it will</span></span>
+<span id="cb33-5"><a href=""></a><span class="co">#' return the value unchanged and as a string.</span></span>
+<span id="cb33-6"><a href=""></a><span class="co">#'</span></span>
+<span id="cb33-7"><a href=""></a><span class="co">#' @param number number to be comma separated</span></span>
+<span id="cb33-8"><a href=""></a><span class="co">#' @param nsmall minimum number of digits to the right of the decimal point</span></span>
+<span id="cb33-9"><a href=""></a><span class="co">#'</span></span>
+<span id="cb33-10"><a href=""></a><span class="co">#' @return string</span></span>
+<span id="cb33-11"><a href=""></a><span class="co">#' @export</span></span>
+<span id="cb33-12"><a href=""></a><span class="co">#'</span></span>
+<span id="cb33-13"><a href=""></a><span class="co">#' @examples</span></span>
+<span id="cb33-14"><a href=""></a><span class="co">#' comma_sep(100)</span></span>
+<span id="cb33-15"><a href=""></a><span class="co">#' comma_sep(1000)</span></span>
+<span id="cb33-16"><a href=""></a><span class="co">#' comma_sep(3567000)</span></span>
+<span id="cb33-17"><a href=""></a>comma_sep <span class="ot">&lt;-</span> <span class="cf">function</span>(number,</span>
+<span id="cb33-18"><a href=""></a>                      <span class="at">nsmall =</span> <span class="dv">0</span>L) {</span>
+<span id="cb33-19"><a href=""></a>  <span class="fu">format</span>(number,</span>
+<span id="cb33-20"><a href=""></a>    <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">nsmall =</span> nsmall, <span class="at">trim =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb33-21"><a href=""></a>    <span class="at">scientific =</span> <span class="cn">FALSE</span></span>
+<span id="cb33-22"><a href=""></a>  )</span>
+<span id="cb33-23"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The documentation (<a href="https://roxygen2.r-lib.org/">roxygen2</a>) and easy automation built around R packages using <a href="https://devtools.r-lib.org/">devtools</a> and <a href="https://usethis.r-lib.org/">usethis</a> is a great reason why structuring code as an R package can be helpful even just for pipelines within teams - see Jacob’s C+C (or Matt Jago?) [TODO] from a few years ago for more details.</p>
+</section>
+<section id="package-tests-examples" class="slide level2">
+<h2>Package tests examples</h2>
+<p>Most commonly in an R package you have unit tests against your functions so that you can ensure they reliably behave as expected for users of the package.</p>
+<p>Example - <a href="https://github.com/dfe-analytical-services/dfeR/tree/main/tests">dfeR tests folder</a></p>
+<p>Example - <a href="https://github.com/dfe-analytical-services/dfeshiny/tree/main/tests">dfeshiny tests folder</a></p>
 </section></section>
 <section>
 <section id="wrap-up" class="title-slide slide level1 center">
 <h1>Wrap up</h1>
 
 </section>
+<section id="additional-tips" class="slide level2">
+<h2>Additional tips</h2>
+<ol type="1">
+<li class="fragment">Whenever you hit an issue, add a quick testthat test for it!
+<ul>
+<li class="fragment"><p>It’s a great way to prevent issues repeating themselves</p></li>
+<li class="fragment"><p>Also allows you to slowly and steadily build up a set of checks that cover things you know could go wrong!</p></li>
+</ul></li>
+<li class="fragment">Start small
+<ul>
+<li class="fragment"><p>Don’t feel like you need to write all of the tests immediately - it’s a great way to lose lots of time in rabbit holes</p></li>
+<li class="fragment"><p>Fewer, reliable tests that check a small amount of things well, are more valuable than a whopping suite of complicated and temperamental checks that check lots of things but add on lots of overhead</p></li>
+</ul></li>
+<li class="fragment">Don’t feel like you need to re-test other packages functions
+<ul>
+<li class="fragment"><p>that’s overkill, most packages already test their functions, so you can (mostly) trust them</p></li>
+<li class="fragment"><p>however, it can be wise to do some research on the quality of the packages you’re using…</p>
+<ul>
+<li class="fragment"><p>has it been updated recently?</p></li>
+<li class="fragment"><p>is it deployed on CRAN?</p></li>
+<li class="fragment"><p>does it have good test coverage?</p></li>
+<li class="fragment"><p>if in doubt get in touch with us and we can take a look (explore.statistics@education.gov.uk)</p></li>
+</ul></li>
+</ul></li>
+</ol>
+</section>
 <section id="remember" class="slide level2">
 <h2>Remember</h2>
-<p>Pass / fail tests will never replace all QA, you still need to use analytical judgement in QA.</p>
-<p>GIVEN - WHEN - THEN</p>
-<p>Don’t feel like you need to re-test other packages functions, that’s overkill, but do do some research on the quality of the packages you’re using!</p>
-<p>Pass / fail tests are fantastic for giving you quick and effective feedback on your code, helping to speed up development and catch bugs early.</p>
-</section>
-<section id="support" class="slide level2">
-<h2>Support?</h2>
-<p>If in doubt - ask the community!</p>
-<p>statistics.development@education.gov.uk are also here to support with all things R and automation!</p>
+<ol type="1">
+<li class="fragment">GIVEN - WHEN - THEN</li>
+<li class="fragment">Pass / fail tests are super quick to add and are fantastic for giving you fast, reliable feedback on your code, helping to speed up development and catch issues early</li>
+<li class="fragment">Pass / fail tests will never replace all QA, you still need to use analytical judgement in QA</li>
+<li class="fragment">If you can think of it, you can probably code it!</li>
+</ol>
 </section>
 <section id="any-questions" class="slide level2">
 <h2>Any questions?</h2>
 <p>cameron.race@education.gov.uk</p>
-<p>Slides made with Quarto</p>
+<p>Slides made with Quarto:</p>
 <ul>
 <li class="fragment"><p><a href="https://github.com/dfe-analytical-services/pass-fail-qa-cc-20241120">GitHub repository</a></p></li>
-<li class="fragment"><p>Slides themselves (deployed to GitHub pages)</p></li>
+<li class="fragment"><p><a href="https://dfe-analytical-services.github.io/pass-fail-qa-cc-20241120/">Slides themselves (deployed to GitHub pages)</a></p></li>
 <li class="fragment"><p><a href="https://quarto.org/docs/presentations/">Get started on your own Quarto slides</a></p></li>
 </ul>
 <div class="quarto-auto-generated-content">
