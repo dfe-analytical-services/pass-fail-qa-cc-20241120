@@ -30,6 +30,8 @@ css: "theme.css"
 
     -   Non R users or senior managers can use as inspiration when directing their teams quality assurance (QA)
 
+    -   Show some starting points for you to get going with
+
 ## Disclaimer: I am not going to
 
 -   Show you through one specific project
@@ -39,24 +41,23 @@ css: "theme.css"
 -   Teach you to QA
 
     -   There are many aspects of QA that require analytical skills, experience and insight to assess and make judgement calls, you can't do all QA with just pass / fail tests
+    -   Lots of QA is specific to the analysis you're doing
 
 -   Teach you how to build R Shiny apps or R packages
 
-    -   I will skim over some of the details of these
+    -   I will skim over some of the details of these to focus on the testing
 
-    -   Both could have multiple coffee and coding sessions in their own right
+    -   Both have had multiple [coffee and coding sessions](https://educationgovuk.sharepoint.com/sites/sarpi/g/AC/Coffee%20and%20Coding.aspx?xsdata=MDV8MDJ8fGVmYmNjMzE0N2ExNjRhNTg4NTQ1MDhkZDA5NGQzY2RifGZhZDI3N2M5YzYwYTRkYTFiNWYzYjNiOGIzNGE4MmY5fDB8MHw2Mzg2NzY5NDk0OTQ2Mjk3MDF8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKV0lqb2lNQzR3TGpBd01EQWlMQ0pRSWpvaVYybHVNeklpTENKQlRpSTZJazkwYUdWeUlpd2lWMVFpT2pFeGZRPT18MXxMMk5vWVhSekx6RTVPakF3T1RGa05EVmxMVEl6TTJFdE5EUTFNeTFoWkdWaUxUUTVObVF5WlRBd09XWmpZMTh6WWpKaU1qSTNNeTFoWmpJM0xUUTVZMk10WVRFMk15MHpaakJrWlRGaU1ESXlaV1pBZFc1eExtZGliQzV6Y0dGalpYTXZiV1Z6YzJGblpYTXZNVGN6TWpBNU9ERTBPRE14TXc9PXw3OWI5ZTBkOGY5YTc0OWVmMjUxYzA4ZGQwOTRkM2NkOXw0ZGQzYzYyMGVjMTc0YTZlYWVmMDY0NDhjZTNmNmM1ZA%3D%3D&sdata=U2t3UjEwVHBYY081NkZHMmk2ZzFEUlZ6SGtVUjdtb2NWSlZ0YmJtR2NqWT0%3D&ovuser=fad277c9-c60a-4da1-b5f3-b3b8b34a82f9%2CCameron.RACE%40EDUCATION.GOV.UK&OR=Teams-HL&CT=1732098230181&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNDEwMjAwMTMxOCIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D) in their own right - have a watch back of them
 
-    -   Our very own Chris Dias has made some great updates to the Analysts' Guide highlight R Shiny guidance \[LINK\]
+    -   Have a look at the [Analysts' Guide R Shiny guidance](https://dfe-analytical-services.github.io/analysts-guide/writing-visualising/dashboards_rshiny.html#learning-r-shiny)
 
-    -   For R packages look no further than [R packages by Hadley Wickham and Jennifer Bryan](https://r-pkgs.org/), it is the Rosetta Stone of R package development
-
-    -   Take a look at some relevant past coffee and coding sessions! \[LINK\]
+    -   For R packages look no further than [R packages by Hadley Wickham and Jennifer Bryan](https://r-pkgs.org/)
 
 ## If you want to get more confident using R
 
--   See our unit's R workshops
+-   See our [unit's R workshop](https://dfe-analytical-services.github.io/analysts-guide/learning-development/learning-support.html#technical-workshops) offer
 
--   OR some of the many, great free online resources
+-   OR some of the many, [great free online resources for getting started with R](https://dfe-analytical-services.github.io/analysts-guide/learning-development/r.html)
 
 -   Remember, the best coders don't have lots of unique knowledge, they're just usually the most willing to search for the answers to problems themselves instead of relying on others, so get stuck in yourself and get curious!
 
@@ -76,6 +77,10 @@ if(nrow(my_table) == 0){
 
 -   It checks for a condition and then if it meets a criteria it stops the code and tries to give a semi-informative error
 
+-   I'm going to show how you can use testthat for this
+
+    -   and then how you can expand on QA in Shiny and R packages
+
 ## Why use automated pass / fail checks as a part of QA?
 
 -   They are incredibly...
@@ -87,6 +92,12 @@ if(nrow(my_table) == 0){
     -   easy to understand
 
 -   They are the best way to start including simple automated checks into your code and data with minimal extra time or overhead to your processes
+
+    <div>
+
+    ![Crafting and pun credit: Mark Pearson](img/qa-lity_street.png){width="25%"}
+
+    </div>
 
 ## Working as a part of a team?
 
@@ -102,23 +113,51 @@ if(nrow(my_table) == 0){
 
     -   All because it clearly and simply documents and tests your assumptions
 
--   You can also use them to add in catches for steps that require manual intervention e.g.
+## Working as a part of a team?
 
-    ```{r echo=TRUE}
-    countries <- as.data.frame("")
+You can also use them to add in catches for steps that require manual intervention e.g.
 
-    if(nrow(countries) == 0){
-      stop("You've forgotten to add countries, run the countries_import.R script before continuing")
-    }
-    ```
+``` r
+  # Check the above and flag discrepancies with master table
+if(length(newPublications) != 0){
+  warning(
+    message("-----------------------"),
+    message("WARNING: There are new publications on the EES find stats page that are not in the master table."),
+    message("-----------------------"),
+    message("The following publications are new:"),
+    print(newPublications),
+    message(""),
+    message("Please update the master table in SQL using the updateMasterTable.R script in this repo."),
+    message(""),
+  )
+}
+
+if(length(newlyOnEES) != 0){
+  warning(
+    message("---------------------"),
+    message("WARNING: A publication marked as unpublished in the master table is now published on EES."),
+    message("---------------------"),
+    message("The following publications are newly published to EES:"),
+    print(newlyOnEES),
+    message(""),
+    message("Please update the rows for these publications in the master table using the updateMasterTable.R script in this repo."),
+    message(""),
+    message("---------------------")
+  )
+}
+
+if(length(newPublications) == 0 && length(newlyOnEES) == 0){
+  message("-----------------------")
+  message("PASS - Master table is up to date with the live service!")
+  message("-----------------------")
+}
+```
 
 ## Working alone?
 
--   <div>
+If you're like me, and ol' Frederick here, you might end up having conversations with yourself about the code...
 
-    !['You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'](img/frederick_taxi_driver.png){fig-alt="'You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'" width="400"}
-
-    </div>
+!['You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?' Frederick Bickles, 2024](img/frederick_taxi_driver.png){fig-alt="'You talkin’ to me? You talkin' to me? Well I'm the only one here. Who the duck do you think you're talking to?'" width="70%"}
 
 <!-- -->
 
@@ -126,11 +165,11 @@ if(nrow(my_table) == 0){
 
     -   Make it easier for you to run the same code reliably
 
-    -   Make it easier for you to understand what the code is supposed to be doing
+    -   Make it easier for you to remember what the code is supposed to be doing
 
     -   Cut down the time when investigating issues
 
-    -   Gives assurance when writing code that it and the outputs are being QA'd consistently
+    -   Give assurance when writing code that it and the outputs are being QA'd consistently
 
 ## Packages we'll use
 
@@ -148,11 +187,7 @@ if(nrow(my_table) == 0){
 
     -   [devtools](https://devtools.r-lib.org/)
 
--   Bonus levels:
-
-    -   [lintr](https://lintr.r-lib.org/)
-
-    -   [styler](https://styler.r-lib.org/)
+-   Bonus level:
 
     -   [GitHub Actions](https://github.com/features/actions) (not a package, nor specifically for R, but something that is genuinely excellent and you should make use of if you can)
 
@@ -243,12 +278,6 @@ try(expect_equal(sum(x, y), 5))
 ```
 
 This throws an error and stops your code - this is particularly helpful if you have certain expectations that later code relies on, and allows you to fix the problem before it compounds and causes lots of later errors.
-
-## Examples
-
-Catching if I need to take a manual action
-
-TODO: dig out analytics example
 
 ## Example data you can use yourself
 
@@ -348,33 +377,23 @@ try(
 ## Examples on star wars data
 
 ```{r echo=TRUE, eval=FALSE}
-# Check that a common problematic rogue entry isn't there
+# Check that a common problematic rogue entry is there
 testthat::expect_in(
-  "Professor Charles Xavier",
+  "Darth Vader",
   dplyr::starwars$name
 )
 
-```
-
-```{r}
-try(testthat::expect_in(
-  "Professor Charles Xavier",
-  !dplyr::starwars$name
-))
-```
-
-```{r echo=TRUE, eval=FALSE}
 # Check that if all items in a vector are present
 testthat::expect_contains(
   dplyr::starwars$name, 
-  !c("Professor Charles Xavier", "C-3PO", "R2-D2")
+  c("Professor Charles Xavier", "C-3PO", "R2-D2")
 )
 ```
 
 ```{r}
 try(testthat::expect_contains(
   dplyr::starwars$name, 
-  !c("Professor Charles Xavier", "C-3PO", "R2-D2")
+  c("Professor Charles Xavier", "C-3PO", "R2-D2")
 ))
 ```
 
@@ -492,15 +511,15 @@ expect_gte(species_summary$avg_mass |> min(), 20)
 
 For more examples of code using this have a look at:
 
--   RAP knowledge share on QA - Fran Elliot in particular showed some good examples
+-   [RAP knowledge share on QA](https://educationgovuk.sharepoint.com/:f:/r/sites/lvewp00086/SSU%20%20open%20sharing/Reproducible%20Analytical%20Pipeline%20(RAP)%20resources/Knowledge-share%20series?csf=1&web=1&e=S76Ld6) had a few good examples of this
 
--   Coffee and coding on testing R code - ?
+-   [Coffee and coding on testing R code](https://web.microsoftstream.com/video/6806b4ba-7b13-4c3c-96f1-9b91c0f1d85b) (Rachel Tadd - 2020)
 
 # Testing R Shiny applications
 
 ## Different R Shiny tests
 
-Testing an application is different to analysis or pipelines, you'll often have a 'suite' or 'suites' of tests that you run periodically in bulk to quickly check the latest version of the code still does all the things it used to.
+Testing an application is different to dotting expectations through your code, you'll often have a 'suite' or 'suites' of tests that you run periodically in bulk to quickly check the latest version of the code still does all the things it used to.
 
 Test types are:
 
@@ -535,9 +554,7 @@ Test types are:
 
 -   Assuming you have shinytest2 installed, you can automatically run all of the above types of tests together using `shinytest2::test_app()`
 
-## Demo app
-
-GitHub repository \[TODO\]
+-   Our [DfE shiny template](https://github.com/dfe-analytical-services/shiny-template) has examples of this - demo
 
 # Bonus: Continuous integration (CI)
 
@@ -553,9 +570,7 @@ GitHub repository \[TODO\]
 
 -   If your code is open and hosted in GitHub (i.e. is safe to share publicly), then you get GitHub Actions for free, and it's incredibly powerful
 
-<!-- -->
-
--   Free access to virtual machines that will run and test your code for you
+    -   Free access to virtual machines that will run and test your code for you
 
     -   A free way to automate code scripts on Git events (commits / pushes / PRs) or on a scheduled job (e.g. once everyday at midnight)
 
@@ -621,7 +636,9 @@ comma_sep <- function(number,
 }
 ```
 
-The documentation ([roxygen2](https://roxygen2.r-lib.org/)) and easy automation built around R packages using [devtools](https://devtools.r-lib.org/) and [usethis](https://usethis.r-lib.org/) is a great reason why structuring code as an R package can be helpful even just for pipelines within teams - see Jacob's C+C (or Matt Jago?) \[TODO\] from a few years ago for more details.
+The documentation ([roxygen2](https://roxygen2.r-lib.org/)) and easy automation built around R packages using [devtools](https://devtools.r-lib.org/) and [usethis](https://usethis.r-lib.org/) is a great reason why structuring code as an R package can be helpful even just for pipelines within teams
+
+-   See the [RAP knowledge share 7 'Beyond statistics'](https://educationgovuk.sharepoint.com/:v:/r/sites/lvewp00086/SSU%20%20open%20sharing/Reproducible%20Analytical%20Pipeline%20(RAP)%20resources/Knowledge-share%20series/Knowledge%20share%207%20-%20RAP%20projects%20OUTSIDE%20of%20statistics%20production!.mp4?csf=1&web=1&e=yO4Maq), Matt Jago talks through his team's move from Excel to using an R package for their pipeline
 
 ## Package tests examples
 
@@ -659,9 +676,14 @@ Example - [dfeshiny tests folder](https://github.com/dfe-analytical-services/dfe
 ## Remember
 
 1.  GIVEN - WHEN - THEN
-2.  Pass / fail tests are super quick to add and are fantastic for giving you fast, reliable feedback on your code, helping to speed up development and catch issues early
-3.  Pass / fail tests will never replace all QA, you still need to use analytical judgement in QA
-4.  If you can think of it, you can probably code it!
+2.  Pass / fail tests are super quick to add
+    -   fast, reliable feedback on your code
+
+    -   help to speed up development by catching issues early
+
+    -   help to document expectations through your code
+3.  Pass / fail tests will never replace all QA
+4.  If you can think of it, you can probably code it, get coding!
 
 ## Any questions?
 
@@ -669,8 +691,10 @@ cameron.race\@education.gov.uk
 
 Slides made with Quarto:
 
+::: {.nonincremental}
 -   [GitHub repository](https://github.com/dfe-analytical-services/pass-fail-qa-cc-20241120)
 
 -   [Slides themselves (deployed to GitHub pages)](https://dfe-analytical-services.github.io/pass-fail-qa-cc-20241120/)
 
 -   [Get started on your own Quarto slides](https://quarto.org/docs/presentations/)
+::: 
